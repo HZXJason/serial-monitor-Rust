@@ -195,15 +195,17 @@ pub enum GuiTabs {
     Commands,
     PlotOptions,
     Record,
-    ImpedacneAnalysis,
+    ImpedanceAnalysis,
     QCMDynamicAnalysis,
+    MulitParamsAnalysis,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GuiWindows {
     RawUART,
-    ImpedanceAnalysis,
+    Impedance,
     QCMDynamic,
+    MulitParams,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -273,6 +275,7 @@ pub struct ImpedanceOptions {
     base_frequency: String,
     holdtime: String,
     i_q_select: String,
+    s_c_select: String,
 }
 
 impl Default for ImpedanceOptions {
@@ -286,6 +289,7 @@ impl Default for ImpedanceOptions {
             base_frequency: "9999000.0".to_owned(),
             holdtime: "1.0".to_owned(),
             i_q_select: "i".to_string(),
+            s_c_select: "s".to_string(),
         }
     }
 }
@@ -491,11 +495,11 @@ impl MyApp {
                         (self.plot_serial_display_ratio + resize_y / panel_height).clamp(0.1, 0.9);
 
                     ui.horizontal(|ui| {
-                        if self.active_window == GuiWindows::ImpedanceAnalysis
+                        if self.active_window == GuiWindows::Impedance
                             && ui
                                 .selectable_value(
                                     &mut self.active_tab,
-                                    Some(GuiTabs::ImpedacneAnalysis),
+                                    Some(GuiTabs::ImpedanceAnalysis),
                                     "Impedance Options",
                                 )
                                 .double_clicked()
@@ -526,6 +530,17 @@ impl MyApp {
                             self.active_tab = None
                         };
 
+                        if self.active_window == GuiWindows::MulitParams
+                            && ui
+                                .selectable_value(
+                                    &mut self.active_tab,
+                                    Some(GuiTabs::MulitParamsAnalysis),
+                                    "MulitParams Options",
+                                )
+                                .double_clicked()
+                        {
+                            self.active_tab = None
+                        };
                         if ui
                             .selectable_value(
                                 &mut self.active_tab,
@@ -549,9 +564,7 @@ impl MyApp {
                             self.active_tab = None
                         };
 
-                        if (self.active_window == GuiWindows::RawUART
-                            || self.active_window == GuiWindows::QCMDynamic)
-                            && ui
+                        if  ui
                                 .selectable_value(
                                     &mut self.active_tab,
                                     Some(GuiTabs::Record),
@@ -561,6 +574,8 @@ impl MyApp {
                         {
                             self.active_tab = None
                         };
+
+                        
 
                         ui.add_space(ui.available_width() - 25.0);
 
@@ -600,11 +615,14 @@ impl MyApp {
                                 GuiTabs::Record => {
                                     self.record_gui(ui);
                                 }
-                                GuiTabs::ImpedacneAnalysis => {
+                                GuiTabs::ImpedanceAnalysis => {
                                     self.impedance_ui(ui);
                                 }
                                 GuiTabs::QCMDynamicAnalysis => {
                                     self.qcmdynamic_ui(ui);
+                                }
+                                GuiTabs::MulitParamsAnalysis => {
+                                    self.mulitparams_ui(ui);
                                 }
                             }
                         }
@@ -667,14 +685,14 @@ impl MyApp {
                         if ui
                             .selectable_value(
                                 &mut self.active_window,
-                                GuiWindows::ImpedanceAnalysis,
+                                GuiWindows::Impedance,
                                 "Impedance Analyzer",
                             )
                             .clicked()
                         {
-                            self.active_tab = Some(GuiTabs::ImpedacneAnalysis);
+                            self.active_tab = Some(GuiTabs::ImpedanceAnalysis);
                             self.gui_event_tx
-                                .send(GuiEvent::SetGuiWindow(GuiWindows::ImpedanceAnalysis))
+                                .send(GuiEvent::SetGuiWindow(GuiWindows::Impedance))
                                 .expect("failed to sync gui window")
                         };
                         if ui
@@ -688,6 +706,19 @@ impl MyApp {
                             self.active_tab = Some(GuiTabs::QCMDynamicAnalysis);
                             self.gui_event_tx
                                 .send(GuiEvent::SetGuiWindow(GuiWindows::QCMDynamic))
+                                .expect("failed to sync gui window")
+                        };
+                        if ui
+                            .selectable_value(
+                                &mut self.active_window,
+                                GuiWindows::MulitParams,
+                                "MulitParams Analyzer",
+                            )
+                            .clicked()
+                        {
+                            self.active_tab = Some(GuiTabs::MulitParamsAnalysis);
+                            self.gui_event_tx
+                                .send(GuiEvent::SetGuiWindow(GuiWindows::MulitParams))
                                 .expect("failed to sync gui window")
                         };
                     });
