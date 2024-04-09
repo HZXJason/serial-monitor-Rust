@@ -197,7 +197,7 @@ pub enum GuiTabs {
     Record,
     ImpedanceAnalysis,
     QCMDynamicAnalysis,
-    MulitParamsAnalysis,
+    MultiParamsAnalysis,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -205,7 +205,7 @@ pub enum GuiWindows {
     RawUART,
     Impedance,
     QCMDynamic,
-    MulitParams,
+    MultiParams,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -530,12 +530,12 @@ impl MyApp {
                             self.active_tab = None
                         };
 
-                        if self.active_window == GuiWindows::MulitParams
+                        if self.active_window == GuiWindows::MultiParams
                             && ui
                                 .selectable_value(
                                     &mut self.active_tab,
-                                    Some(GuiTabs::MulitParamsAnalysis),
-                                    "MulitParams Options",
+                                    Some(GuiTabs::MultiParamsAnalysis),
+                                    "MultiParams Options",
                                 )
                                 .double_clicked()
                         {
@@ -621,7 +621,7 @@ impl MyApp {
                                 GuiTabs::QCMDynamicAnalysis => {
                                     self.qcmdynamic_ui(ui);
                                 }
-                                GuiTabs::MulitParamsAnalysis => {
+                                GuiTabs::MultiParamsAnalysis => {
                                     self.mulitparams_ui(ui);
                                 }
                             }
@@ -711,14 +711,14 @@ impl MyApp {
                         if ui
                             .selectable_value(
                                 &mut self.active_window,
-                                GuiWindows::MulitParams,
-                                "MulitParams Analyzer",
+                                GuiWindows::MultiParams,
+                                "MultiParams Measuring",
                             )
                             .clicked()
                         {
-                            self.active_tab = Some(GuiTabs::MulitParamsAnalysis);
+                            self.active_tab = Some(GuiTabs::MultiParamsAnalysis);
                             self.gui_event_tx
-                                .send(GuiEvent::SetGuiWindow(GuiWindows::MulitParams))
+                                .send(GuiEvent::SetGuiWindow(GuiWindows::MultiParams))
                                 .expect("failed to sync gui window")
                         };
                     });
